@@ -65,6 +65,20 @@ __fzf_history__() (
     fi
 )
 
+__fzf_snippets__() (
+  local line
+  shopt -u nocaseglob nocasematch
+  line=$(
+    cat /home/USER/.fzf_snippets |
+    FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
+    awk -F"#" ' { print $1 }' ) &&
+    if [[ $- =~ H ]]; then
+      sed 's/^ *\([0-9]*\)\** .*/!\1/' <<< "$line"
+    else
+      sed 's/^ *\([0-9]*\)\** *//' <<< "$line"
+    fi
+)
+
 if [[ ! -o vi ]]; then
   # Required to refresh the prompt after fzf
   bind '"\er": redraw-current-line'
@@ -84,6 +98,9 @@ if [[ ! -o vi ]]; then
 
   # ALT-C - cd into the selected directory
   bind '"\ec": " \C-e\C-u`__fzf_cd__`\e\C-e\er\C-m"'
+
+  # ALT-E - Paste the selected command from history into the command line
+  bind '"\ee": " \C-e\C-u`__fzf_snippets__`\e\C-e\e^\er"'
 else
   # We'd usually use "\e" to enter vi-movement-mode so we can do our magic,
   # but this incurs a very noticeable delay of a half second or so,
