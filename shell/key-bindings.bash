@@ -69,7 +69,7 @@ __fzf_snippets__() (
   local line
   shopt -u nocaseglob nocasematch
   line=$(
-    cat /home/$USER/.fzf_snippets |
+    cat $HOME/.fzf_snippets |
     FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} $FZF_DEFAULT_OPTS --tac -n2..,.. --tiebreak=index --bind=ctrl-r:toggle-sort $FZF_CTRL_R_OPTS +m" $(__fzfcmd) |
     awk -F"#" ' { print $1 }' ) &&
     if [[ $- =~ H ]]; then
